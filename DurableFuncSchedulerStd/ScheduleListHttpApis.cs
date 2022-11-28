@@ -62,10 +62,14 @@ namespace DurableFuncSchedulerStd
 
         public record ScheduleId(string Id);
 
-        #region POST
+        #region APU: POST schedule
         [
             FunctionName("AddSchedule"), 
-            OpenApiOperation(operationId: "AddSchedule", tags: new[] { "dynamicSchedule" }), 
+            OpenApiOperation(
+                operationId: "AddSchedule", 
+                tags: new[] { "DynamicScheduleCRUD" },
+                Summary = "Add a new schedules operation"
+            ), 
             OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
             OpenApiRequestBody("application/json", typeof(ScheduleObject)),
             OpenApiResponseWithBody(
@@ -116,10 +120,14 @@ namespace DurableFuncSchedulerStd
         }
         #endregion
 
-        #region PUT
+        #region API: PUT schedule
         [
             FunctionName("UpdateSchedule"),
-            /*OpenApiOperation(operationId: "UpdateSchedule", tags: new[] { "dynamicSchedule" }), 
+            OpenApiOperation(
+                operationId: "UpdateSchedule", 
+                tags: new[] { "DynamicScheduleCRUD" },
+                Summary = "Update an existing scheduled operation"
+            ), 
             OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
             OpenApiRequestBody("application/json", typeof(ScheduleObject)),
             OpenApiParameter(
@@ -138,7 +146,7 @@ namespace DurableFuncSchedulerStd
             OpenApiResponseWithoutBody(
                 HttpStatusCode.BadRequest,
                 Description = "The specified cron string is not a valid crontab string"
-            )*/
+            )
         ]
         public async Task<IActionResult> UpdateSchedule(
             [HttpTrigger(AuthorizationLevel.Function, "put", Route = "schedule/{id:guid}")] HttpRequest req,
@@ -180,10 +188,14 @@ namespace DurableFuncSchedulerStd
         }
         #endregion
 
-        #region GET count
+        #region API: GET schedule/count
         [
             FunctionName("GetSchedulesCount"),
-            OpenApiOperation(operationId: "GetSchedulesCount", tags: new[] { "dynamicSchedule" }), 
+            OpenApiOperation(
+                operationId: "GetSchedulesCount", 
+                tags: new[] { "DynamicScheduleCRUD" },
+                Summary = "Get the total number of schedules operations"
+            ), 
             OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
             OpenApiResponseWithBody(
                 HttpStatusCode.OK,
@@ -207,10 +219,14 @@ namespace DurableFuncSchedulerStd
         }
         #endregion
 
-        #region GET by id
+        #region API: GET schedule/{id}
         [
             FunctionName("GetSchedule"),
-            /*OpenApiOperation(operationId: "GetSchedule", tags: new[] { "dynamicSchedule" }), 
+            OpenApiOperation(
+                operationId: "GetSchedule", 
+                tags: new[] { "DynamicScheduleCRUD" },
+                Summary = "Get a specific schedule by id"
+            ), 
             OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
             OpenApiParameter(
                 "id",
@@ -228,7 +244,7 @@ namespace DurableFuncSchedulerStd
             OpenApiResponseWithoutBody(
                 HttpStatusCode.NotFound,
                 Description = "The requested item was not found"
-            )*/
+            )
         ]
         public async Task<IActionResult> GetSchedule(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "schedule/{id:guid}")] HttpRequest req,
@@ -244,10 +260,14 @@ namespace DurableFuncSchedulerStd
         }
         #endregion
 
-        #region GET all
+        #region API: GET schedule [all]
         [
             FunctionName("GetSchedules"),
-            OpenApiOperation(operationId: "GetSchedules", tags: new[] { "dynamicSchedule" }), 
+            OpenApiOperation(
+                operationId: "GetSchedules", 
+                tags: new[] { "DynamicScheduleCRUD" },
+                Summary = "Get all scheduled operations"
+            ), 
             OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
             OpenApiResponseWithBody(
                 HttpStatusCode.OK, 
@@ -267,10 +287,14 @@ namespace DurableFuncSchedulerStd
         }
         #endregion
 
-        #region DELETE
+        #region API: DELETE schedule/{id}
         [
             FunctionName("DeleteSchedule"),
-            OpenApiOperation(operationId: "DeleteSchedule", tags: new[] { "dynamicSchedule" }), 
+            OpenApiOperation(
+                operationId: "DeleteSchedule", 
+                tags: new[] { "DynamicScheduleCRUD" },
+                Summary = "Delete a specific scheduled operation by id"
+            ), 
             OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
             OpenApiParameter(
                 "id",

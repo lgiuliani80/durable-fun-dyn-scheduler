@@ -161,10 +161,14 @@ namespace DurableFuncSchedulerStd
         }
         #endregion
 
-        #region API: POST /api/startOrchestrator
+        #region API: POST startOrchestrator
         [
             FunctionName("DurableScheduler_HttpStart"),
-            OpenApiOperation(operationId: "DurableScheduler_HttpStart", tags: new[] { "dynamicSchedulesOrchestrator" }), 
+            OpenApiOperation(
+                operationId: "DurableScheduler_HttpStart", 
+                tags: new[] { "Orchestrators" },
+                Summary = "Starts a new Dynamic Schedules Orchestrator. WARNING: there must be only ONE of such orchestrators running!"
+            ), 
             OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
             OpenApiParameter(
                 "name", 
@@ -206,10 +210,14 @@ namespace DurableFuncSchedulerStd
         }
         #endregion
 
-        #region API: GET /api/orchestrators
+        #region API: GET orchestrators
         [
             FunctionName("DurableScheduler_GetOrchestrators"),
-            OpenApiOperation(operationId: "DurableScheduler_GetOrchestrators", tags: new[] { "dynamicSchedulesOrchestrator" }), 
+            OpenApiOperation(
+                operationId: "DurableScheduler_GetOrchestrators", 
+                tags: new[] { "Orchestrators" },
+                Summary = "Get the running orchestrators"
+            ), 
             OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
             OpenApiResponseWithBody(
                 HttpStatusCode.OK,
@@ -229,10 +237,14 @@ namespace DurableFuncSchedulerStd
         }
         #endregion
 
-        #region API: DELETE /api/orchestrators/{instanceId}
+        #region API: DELETE orchestrators/{instanceId}
         [
             FunctionName("DurableScheduler_TerminateOrchestrator"),
-            OpenApiOperation(operationId: "DurableScheduler_TerminateOrchestrator", tags: new[] { "dynamicSchedulesOrchestrator" }), 
+            OpenApiOperation(
+                operationId: "DurableScheduler_TerminateOrchestrator", 
+                tags: new[] { "Orchestrators" },
+                Summary = "Terminate an orchestrator by instance id"
+            ), 
             OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
             OpenApiParameter("id", In = ParameterLocation.Path, Required = true, Description = "Orchestrator Id to terminate"),
             OpenApiResponseWithoutBody(

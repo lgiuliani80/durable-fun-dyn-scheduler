@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,12 +19,16 @@ namespace DurableFuncSchedulerStd
 {
     public class Activities
     {
+        #region Logging
         private readonly ILogger<Activities> _logger;
+        #endregion
 
+        #region Statics
         private static readonly HttpClient cli = new();
-
         private static readonly Random rnd = new Random();
+        #endregion
 
+        #region Local POD classes
         public class Op1Request
         {
             public string Id { get; set; }
@@ -37,20 +40,21 @@ namespace DurableFuncSchedulerStd
             public string PartitionKey { get; set; }
             public string RowKey { get; set; }
             public DateTimeOffset? Timestamp { get; set; }
-            [IgnoreDataMember]
-            public global::Azure.ETag ETag { get; set; }
+            public ETag ETag { get; set; }
 
             public DateTimeOffset DateCreated { get; set; }
             public DateTimeOffset? DateCompleted { get; set; }
             public string Parameter { get; set; }
             public string Result { get; set; }
         }
+        #endregion
 
         public Activities(ILogger<Activities> log)
         {
             _logger = log;
         }
 
+        #region ACTIVITY: post a Op1 operation in queue
         [FunctionName("Op1")]
         [return: Queue("op1-requests")]
         public async Task<Op1Request> Op1EnqueueRequest([ActivityTrigger] IDurableActivityContext context, [Table("pendingops")] TableClient tc)
@@ -79,7 +83,9 @@ namespace DurableFuncSchedulerStd
 
             return retval;
         }
+        #endregion
 
+        #region QUEUE: Op1
         [FunctionName("Op1_ProcessRequest")]
         public void Op1ProcessRequest([QueueTrigger("op1-requests")] Op1Request req, [Table("pendingops")] TableClient tc)
         {
@@ -103,24 +109,28 @@ namespace DurableFuncSchedulerStd
                 _logger.LogWarning(ex, "Unable to find operation {id} in pendingops table", req.Id);
             }
         }
+        #endregion
 
-        class AAA { }
-
+        #region API: POST op1
         [
             FunctionName("Op1_HttpEnqueueRequest"),
-            OpenApiOperation(operationId: "Op1_HttpEnqueueRequest", tags: new[] {"op1"}, Summary = "Enqueues a new 'Op1' operation"), 
+            OpenApiOperation(
+                operationId: "Op1_HttpEnqueueRequest", 
+                tags: new[] {"Op1"}, 
+                Summary = "Enqueues a new 'Op1' operation"
+            ), 
             OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
             OpenApiParameter("parameter", In = ParameterLocation.Query, Required = false, Type = typeof(string)),
             
             OpenApiResponseWithBody(
                 HttpStatusCode.OK,
                 contentType: "application/json",
-                bodyType: typeof(AAA),
+                bodyType: typeof(PendingOperationEntry),
                 Description = "OK"
             )
         ]
         public PendingOperationEntry Op1HttpEnqueueRequest(
-            [HttpTrigger("post", Route = "op1")] HttpRequest req,
+            [HttpTrigger("post", Route = "Op1")] HttpRequest req,
             [Table("pendingops")] TableClient tc,
             [Queue("op1-requests")] out Op1Request dataToEnqueue)
         {
@@ -145,52 +155,79 @@ namespace DurableFuncSchedulerStd
 
             return pendingOp;
         }
+        #endregion
 
+        #region API: GET op1 [all]
         [
             FunctionName("Op1GetOperations"),
-            OpenApiOperation(operationId: "Op1_Op1GetOperations", tags: new[] { "op1" }, Summary = "Get ALL operations, both pending and completed"),
+            OpenApiOperation(
+                operationId: "Op1_Op1GetOperations", 
+                tags: new[] { "Op1" }, 
+                Summary = "Get ALL operations, both pending and completed"
+            ),
             OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
-            /*
             OpenApiResponseWithBody(
                 HttpStatusCode.OK,
                 contentType: "application/json",
                 bodyType: typeof(PendingOperationEntry[]),
                 Description = "OK"
-            )*/
+            )
         ]
-        public object /* IAsyncEnumerable<PendingOperationEntry> */ Op1GetOperations(
+        public IAsyncEnumerable<PendingOperationEntry> Op1GetOperations(
             [HttpTrigger("get", Route = "op1")] HttpRequest req,
             [Table("pendingops")] TableClient tc)
         {
             return tc.QueryAsync<PendingOperationEntry>(x => true);
         }
+        #endregion
 
+        #region API: GET op1/pending
         [
             FunctionName("Op1GetPendingOperations"),
-            OpenApiOperation(operationId: "Op1_Op1GetPendingOperations", tags: new[] { "op1" }, Summary = "Get all currently PENDING operations"),
+            OpenApiOperation(
+                operationId: "Op1_Op1GetPendingOperations", 
+                tags: new[] { "Op1" }, 
+                Summary = "Get all currently PENDING operations"
+            ),
             OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
-            /*
             OpenApiResponseWithBody(
                 HttpStatusCode.OK,
                 contentType: "application/json",
                 bodyType: typeof(PendingOperationEntry[]),
                 Description = "OK"
-            )*/
+            )
         ]
-        public object /* IAsyncEnumerable<PendingOperationEntry> */ Op1GetPendingOperations(
+        public IAsyncEnumerable<PendingOperationEntry> Op1GetPendingOperations(
             [HttpTrigger("get", Route = "op1/pending")] HttpRequest req,
             [Table("pendingops")] TableClient tc)
         {
             return tc.QueryAsync<PendingOperationEntry>(x => x.DateCompleted == null);
         }
+        #endregion
 
-        [FunctionName("Op1GetPendingOperation")]
+        #region API: GET op1/{id}
+        [
+            FunctionName("Op1GetPendingOperation"),
+            OpenApiOperation(
+                operationId: "Op1_Op1GetPendingOperation", 
+                tags: new[] { "Op1" }, 
+                Summary = "Get a specific PENDING by id"
+            ),
+            OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
+            OpenApiResponseWithBody(
+                HttpStatusCode.OK,
+                contentType: "application/json",
+                bodyType: typeof(PendingOperationEntry),
+                Description = "OK"
+            )
+        ]
         public PendingOperationEntry Op1GetPendingOperation(
             [HttpTrigger("get", Route = "op1/{id:guid}")] HttpRequest req,
             [Table("pendingops", partitionKey: "op1", rowKey: "{id}")] PendingOperationEntry entry)
         {
             return entry;
         }
+        #endregion
 
         #region TIMER: DeleteCompletedOperations
         [FunctionName("DeleteCompletedOperations")]
