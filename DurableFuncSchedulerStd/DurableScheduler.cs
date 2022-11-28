@@ -169,7 +169,6 @@ namespace DurableFuncSchedulerStd
                 tags: new[] { "Orchestrators" },
                 Summary = "Starts a new Dynamic Schedules Orchestrator. WARNING: there must be only ONE of such orchestrators running!"
             ), 
-            OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
             OpenApiParameter(
                 "name", 
                 In = ParameterLocation.Path, 
@@ -218,7 +217,6 @@ namespace DurableFuncSchedulerStd
                 tags: new[] { "Orchestrators" },
                 Summary = "Get the running orchestrators"
             ), 
-            OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
             OpenApiResponseWithBody(
                 HttpStatusCode.OK,
                 contentType: "application/json",
@@ -245,7 +243,6 @@ namespace DurableFuncSchedulerStd
                 tags: new[] { "Orchestrators" },
                 Summary = "Terminate an orchestrator by instance id"
             ), 
-            OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
             OpenApiParameter("id", In = ParameterLocation.Path, Required = true, Description = "Orchestrator Id to terminate"),
             OpenApiResponseWithoutBody(
                 HttpStatusCode.NoContent,

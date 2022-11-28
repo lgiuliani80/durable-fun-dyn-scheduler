@@ -70,7 +70,6 @@ namespace DurableFuncSchedulerStd
                 tags: new[] { "DynamicScheduleCRUD" },
                 Summary = "Add a new schedules operation"
             ), 
-            OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
             OpenApiRequestBody("application/json", typeof(ScheduleObject)),
             OpenApiResponseWithBody(
                 HttpStatusCode.Created, 
@@ -128,7 +127,6 @@ namespace DurableFuncSchedulerStd
                 tags: new[] { "DynamicScheduleCRUD" },
                 Summary = "Update an existing scheduled operation"
             ), 
-            OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
             OpenApiRequestBody("application/json", typeof(ScheduleObject)),
             OpenApiParameter(
                 "id", 
@@ -196,7 +194,6 @@ namespace DurableFuncSchedulerStd
                 tags: new[] { "DynamicScheduleCRUD" },
                 Summary = "Get the total number of schedules operations"
             ), 
-            OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
             OpenApiResponseWithBody(
                 HttpStatusCode.OK,
                 contentType: "application/json",
@@ -227,7 +224,6 @@ namespace DurableFuncSchedulerStd
                 tags: new[] { "DynamicScheduleCRUD" },
                 Summary = "Get a specific schedule by id"
             ), 
-            OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
             OpenApiParameter(
                 "id",
                 In = ParameterLocation.Path,
@@ -268,7 +264,6 @@ namespace DurableFuncSchedulerStd
                 tags: new[] { "DynamicScheduleCRUD" },
                 Summary = "Get all scheduled operations"
             ), 
-            OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
             OpenApiResponseWithBody(
                 HttpStatusCode.OK, 
                 contentType: "application/json", 
@@ -295,7 +290,6 @@ namespace DurableFuncSchedulerStd
                 tags: new[] { "DynamicScheduleCRUD" },
                 Summary = "Delete a specific scheduled operation by id"
             ), 
-            OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
             OpenApiParameter(
                 "id",
                 In = ParameterLocation.Path,

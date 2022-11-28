@@ -119,9 +119,7 @@ namespace DurableFuncSchedulerStd
                 tags: new[] {"Op1"}, 
                 Summary = "Enqueues a new 'Op1' operation"
             ), 
-            OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
             OpenApiParameter("parameter", In = ParameterLocation.Query, Required = false, Type = typeof(string)),
-            
             OpenApiResponseWithBody(
                 HttpStatusCode.OK,
                 contentType: "application/json",
@@ -165,7 +163,6 @@ namespace DurableFuncSchedulerStd
                 tags: new[] { "Op1" }, 
                 Summary = "Get ALL operations, both pending and completed"
             ),
-            OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
             OpenApiResponseWithBody(
                 HttpStatusCode.OK,
                 contentType: "application/json",
@@ -189,7 +186,6 @@ namespace DurableFuncSchedulerStd
                 tags: new[] { "Op1" }, 
                 Summary = "Get all currently PENDING operations"
             ),
-            OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
             OpenApiResponseWithBody(
                 HttpStatusCode.OK,
                 contentType: "application/json",
@@ -213,7 +209,6 @@ namespace DurableFuncSchedulerStd
                 tags: new[] { "Op1" }, 
                 Summary = "Get a specific PENDING by id"
             ),
-            OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
             OpenApiResponseWithBody(
                 HttpStatusCode.OK,
                 contentType: "application/json",
