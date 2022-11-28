@@ -38,7 +38,7 @@ namespace DurableFuncSchedulerStd
             public string RowKey { get; set; }
             public DateTimeOffset? Timestamp { get; set; }
             [IgnoreDataMember]
-            public ETag ETag { get; set; }
+            public global::Azure.ETag ETag { get; set; }
 
             public DateTimeOffset DateCreated { get; set; }
             public DateTimeOffset? DateCompleted { get; set; }
@@ -104,20 +104,22 @@ namespace DurableFuncSchedulerStd
             }
         }
 
+        class AAA { }
+
         [
             FunctionName("Op1_HttpEnqueueRequest"),
             OpenApiOperation(operationId: "Op1_HttpEnqueueRequest", tags: new[] {"op1"}, Summary = "Enqueues a new 'Op1' operation"), 
             OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
             OpenApiParameter("parameter", In = ParameterLocation.Query, Required = false, Type = typeof(string)),
-            /*
+            
             OpenApiResponseWithBody(
                 HttpStatusCode.OK,
                 contentType: "application/json",
-                bodyType: typeof(PendingOperationEntry),
+                bodyType: typeof(AAA),
                 Description = "OK"
-            )*/
+            )
         ]
-        public object /* PendingOperationEntry */ Op1HttpEnqueueRequest(
+        public PendingOperationEntry Op1HttpEnqueueRequest(
             [HttpTrigger("post", Route = "op1")] HttpRequest req,
             [Table("pendingops")] TableClient tc,
             [Queue("op1-requests")] out Op1Request dataToEnqueue)
@@ -163,8 +165,19 @@ namespace DurableFuncSchedulerStd
             return tc.QueryAsync<PendingOperationEntry>(x => true);
         }
 
-        [FunctionName("Op1GetPendingOperations")]
-        public IAsyncEnumerable<PendingOperationEntry> Op1GetPendingOperations(
+        [
+            FunctionName("Op1GetPendingOperations"),
+            OpenApiOperation(operationId: "Op1_Op1GetPendingOperations", tags: new[] { "op1" }, Summary = "Get all currently PENDING operations"),
+            OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query),
+            /*
+            OpenApiResponseWithBody(
+                HttpStatusCode.OK,
+                contentType: "application/json",
+                bodyType: typeof(PendingOperationEntry[]),
+                Description = "OK"
+            )*/
+        ]
+        public object /* IAsyncEnumerable<PendingOperationEntry> */ Op1GetPendingOperations(
             [HttpTrigger("get", Route = "op1/pending")] HttpRequest req,
             [Table("pendingops")] TableClient tc)
         {
